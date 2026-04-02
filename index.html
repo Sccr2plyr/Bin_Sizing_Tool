@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Bin Sizing Tool</title>
+    <link rel="stylesheet" href="style.css"/>
+    <script type="importmap">
+      {
+        "imports": {
+          "three": "https://unpkg.com/three@0.157.0/build/three.module.js",
+          "orbitcontrols": "https://unpkg.com/three@0.157.0/examples/jsm/controls/OrbitControls.js",
+          "measurements": "./js/measurements.js",
+          "sidepart": "./js/sidepart.js",
+          "bottompart": "./js/bottompart.js",
+          "frontpart": "./js/frontpart.js",
+          "backpart": "./js/backpart.js",
+          "whole": "./js/whole.js"
+        }
+      }
+    </script>
+    <script src="./js/canvas2svg.js"></script>
+  </head>
+  <body>
+    <main class="container">
+      <div class="form-container flex-item">
+        <div class="title-row">
+          <h2 class="form-title">Bin Sizing</h2>
+          <div class="switch">
+            <input type="checkbox" name="type" id="type" class="type-checkbox" hidden/>
+            <label for="type" class="switch-label"></label>
+          </div>
+        </div>
+
+        <div>
+          <p class="part-caption">View panels (multi-select):</p>
+          <div class="part-selector">
+            <button type="button" class="part-btn active" data-part="all">All</button>
+            <button type="button" class="part-btn" data-part="front">Front</button>
+            <button type="button" class="part-btn" data-part="back">Back</button>
+            <button type="button" class="part-btn" data-part="left">Left</button>
+            <button type="button" class="part-btn" data-part="right">Right</button>
+            <button type="button" class="part-btn" data-part="bottom">Bottom</button>
+          </div>
+        </div>
+
+        <form class="form">
+          <div class="field-container">
+            <label for="length">Length<span class="units">(in)</span></label>
+            <input type="number" name="length" id="length" class="input-field" value="20" step="0.1" min="0.1"/>
+          </div>
+          <div class="field-container">
+            <label for="breadth">Width<span class="units">(in)</span></label>
+            <input type="number" name="breadth" id="breadth" class="input-field" value="10" step="0.1" min="0.1"/>
+          </div>
+          <div class="field-container">
+            <label for="depth">Height<span class="units">(in)</span></label>
+            <input type="number" name="depth" id="depth" class="input-field" value="10" step="0.1" min="0.1"/>
+          </div>
+          <div class="field-container">
+            <label for="thickness">Material Thickness<span class="units">(in)</span></label>
+            <input type="number" name="thickness" id="thickness" class="input-field" value="0.5" step="0.1" min="0.05"/>
+          </div>
+
+          <p class="error-msg" id="error-msg" style="display:none"></p>
+          <button type="submit" class="submit-button">Download SVG</button>
+        </form>
+
+        <section class="preset-section" aria-label="Common bin sizes">
+          <div class="preset-head">
+            <h3>Common Bin Sizes</h3>
+            <p>Select a size to auto-fill length, width, height, and thickness.</p>
+          </div>
+          <div class="preset-layout">
+            <div class="preset-list" id="preset-list" aria-label="Bin size preset gallery"></div>
+            <a
+              class="preset-preview"
+              id="preset-preview"
+              href="#"
+              target="_blank"
+              rel="noopener noreferrer sponsored"
+            >
+              <img id="preset-preview-image" alt="Selected preset preview"/>
+              <div class="preset-preview-copy">
+                <strong id="preset-preview-name">Select a preset</strong>
+                <span id="preset-preview-meta">Size details will appear here.</span>
+                <span class="preset-preview-cta">Open reference link</span>
+              </div>
+            </a>
+          </div>
+        </section>
+      </div>
+
+      <div class="canvas-container flex-item">
+        <div class="canvas-tabs" role="tablist" aria-label="Preview and chat tabs">
+          <button
+            type="button"
+            class="canvas-tab active"
+            id="tab-preview"
+            data-tab="preview"
+            role="tab"
+            aria-selected="true"
+            aria-controls="panel-preview"
+          >Preview</button>
+          <button
+            type="button"
+            class="canvas-tab"
+            id="tab-chat"
+            data-tab="chat"
+            role="tab"
+            aria-selected="false"
+            aria-controls="panel-chat"
+          >Chat</button>
+        </div>
+
+        <div class="canvas-panel active" id="panel-preview" role="tabpanel" aria-labelledby="tab-preview">
+          <div class="affiliate-strip affiliate-strip-top" aria-label="Sponsored affiliate links">
+            <div class="affiliate-track" id="affiliate-track-top"></div>
+          </div>
+          <canvas id="main-canvas" class="canvas"></canvas>
+          <div class="affiliate-strip affiliate-strip-bottom" aria-label="Sponsored affiliate links">
+            <div class="affiliate-track" id="affiliate-track-bottom"></div>
+          </div>
+          <p class="affiliate-disclosure">As an Amazon Associate I earn from qualifying purchases.</p>
+          <div class="canvas-hint">Drag to rotate · Scroll to zoom</div>
+        </div>
+
+        <div class="canvas-panel" id="panel-chat" role="tabpanel" aria-labelledby="tab-chat" aria-hidden="true">
+          <div class="chat-shell">
+            <p class="chat-note">Sign in to comment. Moderation is enabled.</p>
+            <div id="giscus-thread" aria-label="Comments thread"></div>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <script type="module" src="./js/script.js"></script>
+  </body>
+</html>
