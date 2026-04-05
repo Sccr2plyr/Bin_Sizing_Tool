@@ -19,11 +19,21 @@ const canvasTabs = Array.from(document.querySelectorAll(".canvas-tab"));
 const previewPanel = document.getElementById("panel-preview");
 const chatPanel = document.getElementById("panel-chat");
 const giscusHost = document.getElementById("giscus-thread");
-const shareButton = document.getElementById("share-config");
-const shareStatus = document.getElementById("share-status");
+const publicSiteUrlMeta = document.querySelector('meta[name="public-site-url"]');
+const shareSection = document.querySelector(".share-section-canvas");
+const shareTrigger = document.getElementById("share-trigger");
+const sharePanel = document.getElementById("share-panel");
+const shareFeedback = document.getElementById("share-feedback");
+const shareNetworkLinks = Array.from(document.querySelectorAll("[data-share-network]"));
+const instagramShareButton = document.getElementById("share-instagram");
+const copyLinkButton = document.getElementById("share-copy-link");
 let giscusLoaded = false;
 let currentUnit = "in";
 let activeAffiliateId = null;
+let sharePanelOpen = true;
+
+const SHARE_PREVIEW_VERSION = "v4";
+const INSTAGRAM_COPY_MESSAGE = "Instagram doesn't support direct web sharing from the browser yet. Copy this link and add it to your story or bio:";
 
 const canvas = document.querySelector("canvas");
 const canvasContainer = document.querySelector(".canvas-container");
@@ -330,22 +340,116 @@ function setCanvasTab(tabName) {
   if (isChat) loadGiscusIfNeeded();
 }
 
-function setShareStatus(message, type = "") {
-  if (!shareStatus) return;
-  shareStatus.textContent = message;
-  shareStatus.classList.remove("success", "error");
-  if (type) shareStatus.classList.add(type);
+function normalizePublicUrl(value) {
+  const trimmedValue = String(value || "").trim();
+  if (!trimmedValue) return "";
+
+  try {
+    return new URL(trimmedValue).toString();
+  } catch (error) {
+    try {
+      return new URL(`https://${trimmedValue}`).toString();
+    } catch (nestedError) {
+      return "";
+    }
+  }
 }
 
-function buildShareUrl() {
-  const url = new URL(window.location.href);
+function getPublicSiteUrl() {
+  return normalizePublicUrl(publicSiteUrlMeta?.content);
+}
+
+function isLocalHostname(hostname = window.location.hostname) {
+  return ["localhost", "127.0.0.1", "0.0.0.0", "::1"].includes(hostname) || hostname.endsWith(".local");
+}
+
+function setShareFeedback(message = "", type = "") {
+  if (!shareFeedback) return;
+  shareFeedback.textContent = message;
+  shareFeedback.classList.remove("success", "error");
+  if (type) shareFeedback.classList.add(type);
+}
+
+function ensurePublicSiteUrlForLocal({ silent = false } = {}) {
+  if (!isLocalHostname()) return getPublicSiteUrl() || window.location.origin;
+
+  const publicSiteUrl = getPublicSiteUrl();
+  if (publicSiteUrl) return publicSiteUrl;
+
+  if (!silent) {
+    setShareFeedback(
+      'Using the current localhost URL for sharing. Set meta[name="public-site-url"] to use your public site URL instead.',
+      ""
+    );
+  }
+
+  return window.location.origin;
+}
+
+function ensureShareStateReady({ silent = false } = {}) {
+  if (handleInput(true)) return true;
+
+  if (!silent) setShareFeedback("Fix measurements before sharing.", "error");
+  return false;
+}
+
+function getSharePayload({ silent = false } = {}) {
+  const shareOrigin = ensurePublicSiteUrlForLocal({ silent });
+  if (!shareOrigin) return null;
+
+  const url = new URL(window.location.pathname, shareOrigin);
   url.searchParams.set("l", form["length"].value);
   url.searchParams.set("b", form["breadth"].value);
   url.searchParams.set("d", form["depth"].value);
   url.searchParams.set("t", form["thickness"].value);
   url.searchParams.set("u", typeCheckbox.checked ? "mm" : "in");
   url.searchParams.set("parts", Array.from(selectedParts).join(","));
-  return url.toString();
+  url.searchParams.set("share_preview", SHARE_PREVIEW_VERSION);
+
+  return {
+    title: "Bin Sizing Tool",
+    text: "Check out this bin sizing setup:",
+    url: url.toString(),
+    pinterestMedia: new URL("/preview.png", shareOrigin).toString(),
+    instagramText: `${INSTAGRAM_COPY_MESSAGE}\n${url.toString()}`,
+  };
+}
+
+function buildShareLinks(payload) {
+  const shareEndpoints = {
+    facebook: `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(payload.url)}`,
+    pinterest: `https://pinterest.com/pin/create/button/?url=${encodeURIComponent(payload.url)}&media=${encodeURIComponent(payload.pinterestMedia)}&description=${encodeURIComponent(payload.text)}`,
+    twitter: `https://twitter.com/intent/tweet?url=${encodeURIComponent(payload.url)}&text=${encodeURIComponent(payload.text)}`,
+    linkedin: `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(payload.url)}`,
+    reddit: `https://www.reddit.com/submit?url=${encodeURIComponent(payload.url)}&title=${encodeURIComponent(payload.title)}`,
+  };
+
+  shareNetworkLinks.forEach((link) => {
+    const nextUrl = shareEndpoints[link.dataset.shareNetwork];
+    if (!nextUrl) {
+      link.setAttribute("aria-disabled", "true");
+      link.removeAttribute("href");
+      return;
+    }
+
+    link.href = nextUrl;
+    link.removeAttribute("aria-disabled");
+  });
+}
+
+function prepareSocialShareOrBlock({ silent = false } = {}) {
+  const payload = getSharePayload({ silent });
+
+  if (!payload) {
+    shareNetworkLinks.forEach((link) => {
+      link.setAttribute("aria-disabled", "true");
+      link.removeAttribute("href");
+    });
+    return null;
+  }
+
+  buildShareLinks(payload);
+  return payload;
 }
 
 async function copyToClipboard(text) {
@@ -366,28 +470,63 @@ async function copyToClipboard(text) {
   document.body.removeChild(helper);
 }
 
-async function shareConfiguration() {
-  if (!handleInput(true)) {
-    setShareStatus("Fix measurements before sharing.", "error");
-    return;
+async function copyShareUrl(mode = "copy") {
+  if (!ensureShareStateReady()) {
+    setSharePanelOpen(true);
+    return false;
   }
 
-  const shareUrl = buildShareUrl();
-  const shareTitle = "Bin Sizing Configuration";
-  const shareText = "Open this bin sizing setup:";
+  const payload = prepareSocialShareOrBlock();
+  if (!payload) {
+    setSharePanelOpen(true);
+    return false;
+  }
+
+  const copyText = mode === "instagram" ? payload.instagramText : payload.url;
+  const successMessage =
+    mode === "instagram"
+      ? "Instagram copy text copied."
+      : "Share link copied.";
 
   try {
-    if (navigator.share) {
-      await navigator.share({ title: shareTitle, text: shareText, url: shareUrl });
-      setShareStatus("Configuration shared.", "success");
-      return;
-    }
-
-    await copyToClipboard(shareUrl);
-    setShareStatus("Share link copied to clipboard.", "success");
-  } catch (err) {
-    setShareStatus("Unable to share right now.", "error");
+    await copyToClipboard(copyText);
+    setShareFeedback(successMessage, "success");
+    setSharePanelOpen(true);
+    return true;
+  } catch (error) {
+    setShareFeedback("Unable to copy the share link right now.", "error");
+    return false;
   }
+}
+
+async function shareNativelyIfAvailable() {
+  if (!ensureShareStateReady()) return false;
+
+  const payload = getSharePayload();
+  if (!payload || typeof navigator.share !== "function") return false;
+
+  try {
+    await navigator.share({ title: payload.title, text: payload.text, url: payload.url });
+    setShareFeedback("Configuration shared.", "success");
+    return true;
+  } catch (error) {
+    if (error?.name === "AbortError") return false;
+    setShareFeedback("Unable to share right now.", "error");
+    return false;
+  }
+}
+
+function setSharePanelOpen(isOpen) {
+  sharePanelOpen = Boolean(isOpen);
+  if (!sharePanel || !shareTrigger) return;
+
+  sharePanel.hidden = !sharePanelOpen;
+  shareTrigger.setAttribute("aria-expanded", String(sharePanelOpen));
+  shareSection?.classList.toggle("is-open", sharePanelOpen);
+}
+
+function shouldPersistSharePanel() {
+  return window.innerWidth >= 900;
 }
 
 function render() {
@@ -453,6 +592,7 @@ function handleInput(normalize = false) {
     scene.add(bin3DObject.initialize(Measurements.measurements));
     svgContext = bin3DObject.getSvg();
     updateVisibleParts();
+    prepareSocialShareOrBlock({ silent: true });
   }
   return true;
 }
@@ -512,10 +652,68 @@ canvasTabs.forEach((btn) => {
 });
 
 document.querySelectorAll(".part-btn").forEach((btn) => {
-  btn.addEventListener("click", () => showPart(btn.dataset.part));
+  btn.addEventListener("click", () => {
+    showPart(btn.dataset.part);
+    prepareSocialShareOrBlock({ silent: true });
+  });
 });
 
-shareButton?.addEventListener("click", shareConfiguration);
+if (shareTrigger && sharePanel) {
+  prepareSocialShareOrBlock({ silent: true });
+  setSharePanelOpen(shouldPersistSharePanel());
+
+  shareTrigger.addEventListener("click", async () => {
+    const sharedNatively = await shareNativelyIfAvailable();
+    if (sharedNatively) return;
+
+    if (!ensureShareStateReady()) {
+      setSharePanelOpen(true);
+      return;
+    }
+
+    const payload = prepareSocialShareOrBlock();
+    if (!payload) {
+      setSharePanelOpen(true);
+      return;
+    }
+
+    setSharePanelOpen(!sharePanelOpen);
+  });
+
+  shareNetworkLinks.forEach((link) => {
+    link.addEventListener("click", (event) => {
+      if (!ensureShareStateReady()) {
+        event.preventDefault();
+        setSharePanelOpen(true);
+        return;
+      }
+
+      const payload = prepareSocialShareOrBlock();
+      if (!payload || link.getAttribute("aria-disabled") === "true") {
+        event.preventDefault();
+        setSharePanelOpen(true);
+      } else {
+        setShareFeedback("");
+      }
+    });
+  });
+
+  instagramShareButton?.addEventListener("click", () => copyShareUrl("instagram"));
+  copyLinkButton?.addEventListener("click", () => copyShareUrl("copy"));
+
+  document.addEventListener("click", (event) => {
+    if (shouldPersistSharePanel()) return;
+    if (!shareSection?.contains(event.target)) setSharePanelOpen(false);
+  });
+
+  document.addEventListener("keydown", (event) => {
+    if (event.key === "Escape" && !shouldPersistSharePanel()) setSharePanelOpen(false);
+  });
+
+  window.addEventListener("resize", () => {
+    if (shouldPersistSharePanel()) setSharePanelOpen(true);
+  });
+}
 
 renderPresetList();
 renderAffiliateStrips();

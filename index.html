@@ -3,6 +3,7 @@
   <head>
     <meta charset="UTF-8"/>
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <meta name="public-site-url" content=""/>
     <title>Bin Sizing Tool</title>
     <link rel="stylesheet" href="style.css"/>
     <script type="importmap">
@@ -31,11 +32,6 @@
             <label for="type" class="switch-label"></label>
           </div>
         </div>
-
-        <section class="share-section" aria-label="Share configuration">
-          <button type="button" class="share-button" id="share-config">Share Configuration</button>
-          <p class="share-status" id="share-status" role="status" aria-live="polite"></p>
-        </section>
 
         <div>
           <p class="part-caption">View panels (multi-select):</p>
@@ -119,6 +115,63 @@
         </div>
 
         <div class="canvas-panel active" id="panel-preview" role="tabpanel" aria-labelledby="tab-preview">
+          <section class="share-section share-section-canvas" aria-label="Share this tool">
+            <button
+              type="button"
+              class="share-trigger"
+              id="share-trigger"
+              aria-expanded="true"
+              aria-controls="share-panel"
+            >
+              <span class="share-trigger-icon" aria-hidden="true">↗</span>
+              <span>Share this tool</span>
+            </button>
+            <div class="share-panel" id="share-panel">
+              <a
+                class="share-chip"
+                id="share-facebook"
+                data-share-network="facebook"
+                href="#"
+                target="_blank"
+                rel="noopener noreferrer"
+              >Facebook</a>
+              <a
+                class="share-chip"
+                id="share-pinterest"
+                data-share-network="pinterest"
+                href="#"
+                target="_blank"
+                rel="noopener noreferrer"
+              >Pinterest</a>
+              <a
+                class="share-chip"
+                id="share-twitter"
+                data-share-network="twitter"
+                href="#"
+                target="_blank"
+                rel="noopener noreferrer"
+              >X / Twitter</a>
+              <a
+                class="share-chip"
+                id="share-linkedin"
+                data-share-network="linkedin"
+                href="#"
+                target="_blank"
+                rel="noopener noreferrer"
+              >LinkedIn</a>
+              <a
+                class="share-chip"
+                id="share-reddit"
+                data-share-network="reddit"
+                href="#"
+                target="_blank"
+                rel="noopener noreferrer"
+              >Reddit</a>
+              <button type="button" class="share-chip" id="share-instagram" data-share-copy="instagram">Instagram (copy link)</button>
+              <button type="button" class="share-chip" id="share-copy-link" data-share-copy="copy">Copy Link</button>
+            </div>
+            <p class="share-feedback" id="share-feedback" role="status" aria-live="polite"></p>
+          </section>
           <div class="affiliate-strip affiliate-strip-top" aria-label="Sponsored affiliate links">
             <div class="affiliate-track" id="affiliate-track-top"></div>
           </div>
