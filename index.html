@@ -47,32 +47,32 @@
         <form class="form">
           <div class="field-container">
             <label for="length">Length<span class="units">(in)</span></label>
-            <input type="number" name="length" id="length" class="input-field" value="20" step="0.1" min="0.1"/>
+            <input type="number" name="length" id="length" class="input-field" value="20" step="0.001" min="0.1"/>
           </div>
           <div class="field-container">
             <label for="breadth">Width<span class="units">(in)</span></label>
-            <input type="number" name="breadth" id="breadth" class="input-field" value="10" step="0.1" min="0.1"/>
+            <input type="number" name="breadth" id="breadth" class="input-field" value="10" step="0.001" min="0.1"/>
           </div>
           <div class="field-container">
             <label for="depth">Height<span class="units">(in)</span></label>
-            <input type="number" name="depth" id="depth" class="input-field" value="10" step="0.1" min="0.1"/>
+            <input type="number" name="depth" id="depth" class="input-field" value="10" step="0.001" min="0.1"/>
           </div>
           <div class="field-container">
             <label for="thickness">Material Thickness<span class="units">(in)</span></label>
-            <input type="number" name="thickness" id="thickness" class="input-field" value="0.5" step="0.1" min="0.05"/>
+            <input type="number" name="thickness" id="thickness" class="input-field" value="0.5" step="0.05" min="0.05"/>
           </div>
 
           <p class="error-msg" id="error-msg" style="display:none"></p>
           <button type="submit" class="submit-button">Download SVG</button>
         </form>
 
-        <section class="preset-section" aria-label="Common bin sizes">
+        <section class="preset-section" aria-label="Affiliate links library">
           <div class="preset-head">
-            <h3>Common Bin Sizes</h3>
-            <p>Select a size to auto-fill length, width, height, and thickness.</p>
+            <h3>Applicable Links Library</h3>
+            <p>Browse sponsored products and open links directly.</p>
           </div>
           <div class="preset-layout">
-            <div class="preset-list" id="preset-list" aria-label="Bin size preset gallery"></div>
+            <div class="preset-list" id="preset-list" aria-label="Affiliate product gallery"></div>
             <a
               class="preset-preview"
               id="preset-preview"
@@ -80,11 +80,11 @@
               target="_blank"
               rel="noopener noreferrer sponsored"
             >
-              <img id="preset-preview-image" alt="Selected preset preview"/>
+              <img id="preset-preview-image" alt="Selected product preview"/>
               <div class="preset-preview-copy">
-                <strong id="preset-preview-name">Select a preset</strong>
-                <span id="preset-preview-meta">Size details will appear here.</span>
-                <span class="preset-preview-cta">Open reference link</span>
+                <strong id="preset-preview-name">Select a product</strong>
+                <span id="preset-preview-meta">Affiliate details will appear here.</span>
+                <span class="preset-preview-cta">Open affiliate link</span>
               </div>
             </a>
           </div>

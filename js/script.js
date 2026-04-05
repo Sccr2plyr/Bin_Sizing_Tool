@@ -19,7 +19,6 @@ const canvasTabs = Array.from(document.querySelectorAll(".canvas-tab"));
 const previewPanel = document.getElementById("panel-preview");
 const chatPanel = document.getElementById("panel-chat");
 const giscusHost = document.getElementById("giscus-thread");
-let selectedPresetId = null;
 let giscusLoaded = false;
 let currentUnit = "in";
 
@@ -43,7 +42,7 @@ const controls = new OrbitControls(camera, renderer.domElement);
 const scene = new THREE.Scene();
 const bin3DObject = new Bin();
 const partNames = ["front", "back", "left", "right", "bottom"];
-let selectedParts = new Set(["front"]);
+let selectedParts = new Set(partNames);
 
 scene.add(bin3DObject.initialize(Measurements.measurements));
 let svgContext = bin3DObject.getSvg();
@@ -89,7 +88,6 @@ const binPresets = [
     breadthIn: 6,
     depthIn: 4,
     thicknessIn: 0.25,
-    affiliateUrl: "https://example.com/small-desktop-bin",
     image: productPlaceholder("Small Bin", "#3d5a80", "#ffffff"),
   },
   {
@@ -99,7 +97,6 @@ const binPresets = [
     breadthIn: 9,
     depthIn: 6,
     thicknessIn: 0.25,
-    affiliateUrl: "https://example.com/craft-storage-bin",
     image: productPlaceholder("Craft Bin", "#6d597a", "#ffffff"),
   },
   {
@@ -109,7 +106,6 @@ const binPresets = [
     breadthIn: 10,
     depthIn: 8,
     thicknessIn: 0.3,
-    affiliateUrl: "https://example.com/deep-organizer-bin",
     image: productPlaceholder("Deep Bin", "#355070", "#ffffff"),
   },
   {
@@ -119,8 +115,53 @@ const binPresets = [
     breadthIn: 12,
     depthIn: 8,
     thicknessIn: 0.4,
-    affiliateUrl: "https://example.com/garage-parts-bin",
     image: productPlaceholder("Garage Bin", "#293241", "#ffffff"),
+  },
+];
+
+// Replace these placeholders with your real affiliate links and product images.
+const affiliateProducts = [
+  {
+    id: "affiliate-1",
+    name: "Honeycomb Laser Bed",
+    url: "https://amzn.to/4mhfqPk",
+    image: productPlaceholder("Honeycomb Bed", "#1d3557", "#ffffff"),
+    alt: "Honeycomb laser bed",
+  },
+  {
+    id: "affiliate-2",
+    name: "Colored Basswood Sheets",
+    url: "https://amzn.to/3PQ110o",
+    image: productPlaceholder("Basswood", "#2a9d8f", "#ffffff"),
+    alt: "Colored basswood sheets",
+  },
+  {
+    id: "affiliate-3",
+    name: "Natural Cork Coasters",
+    url: "https://amzn.to/4dNPloT",
+    image: productPlaceholder("Coasters", "#e76f51", "#ffffff"),
+    alt: "Natural cork coasters",
+  },
+  {
+    id: "affiliate-4",
+    name: "Basswood Plywood Sheets",
+    url: "https://amzn.to/48vXTgn",
+    image: productPlaceholder("Plywood", "#6a4c93", "#ffffff"),
+    alt: "Basswood plywood sheets",
+  },
+  {
+    id: "affiliate-5",
+    name: "Clear Acrylic Sheets",
+    url: "https://amzn.to/4toovYH",
+    image: productPlaceholder("Acrylic", "#457b9d", "#ffffff"),
+    alt: "Clear acrylic sheets",
+  },
+  {
+    id: "affiliate-6",
+    name: "Colorful Aluminum Cards",
+    url: "https://amzn.to/4bT1nMg",
+    image: productPlaceholder("Aluminum", "#264653", "#ffffff"),
+    alt: "Colorful aluminum cards",
   },
 ];
 
@@ -153,63 +194,42 @@ function updateVisibleParts() {
   });
 }
 
-function formatPresetDimension(inches) {
-  return currentUnit === "in"
-    ? `${inches.toFixed(2)} in`
-    : `${(inches * 25.4).toFixed(1)} mm`;
-}
-
-function setInputValueFromInches(id, inches) {
-  const el = document.getElementById(id);
-  el.value = currentUnit === "in" ? inches.toFixed(2) : (inches * 25.4).toFixed(2);
-}
-
-function updatePresetPreview(preset) {
-  const hasLink = Boolean((preset.affiliateUrl || "").trim());
-  previewLink.href = hasLink ? preset.affiliateUrl : "#";
+function updatePresetPreview(item) {
+  const hasLink = Boolean((item.url || "").trim());
+  previewLink.href = hasLink ? item.url : "#";
   previewLink.classList.toggle("disabled", !hasLink);
-  previewImg.src = preset.image;
-  previewName.textContent = preset.name;
-  const base = `L ${formatPresetDimension(preset.lengthIn)} · W ${formatPresetDimension(preset.breadthIn)} · H ${formatPresetDimension(preset.depthIn)} · T ${formatPresetDimension(preset.thicknessIn)}`;
-  previewMeta.textContent = hasLink ? base : `${base} · Reference link pending`;
-}
-
-function applyPreset(preset) {
-  selectedPresetId = preset.id;
-  setInputValueFromInches("length", preset.lengthIn);
-  setInputValueFromInches("breadth", preset.breadthIn);
-  setInputValueFromInches("depth", preset.depthIn);
-  setInputValueFromInches("thickness", preset.thicknessIn);
-  updatePresetPreview(preset);
-  renderPresetList();
-  handleInput();
+  previewImg.src = item.image;
+  previewName.textContent = item.name;
+  previewMeta.textContent = hasLink
+    ? "Sponsored affiliate product"
+    : "Sponsored affiliate product · Link pending";
 }
 
 function renderPresetList() {
   if (!presetList) return;
   presetList.innerHTML = "";
-  binPresets.forEach((preset) => {
-    const button = document.createElement("button");
-    button.type = "button";
-    button.className = "preset-item";
-    if (preset.id === selectedPresetId) button.classList.add("active");
-    button.setAttribute("aria-label", `${preset.name} preset`);
-    button.innerHTML = `<img src="${preset.image}" alt="${preset.name}"/><div class="preset-item-copy"><strong>${preset.name}</strong><span>L ${formatPresetDimension(preset.lengthIn)}</span></div>`;
-    button.addEventListener("click", () => applyPreset(preset));
-    presetList.appendChild(button);
+  affiliateProducts.forEach((item) => {
+    const card = document.createElement("a");
+    card.className = "preset-item";
+    card.href = (item.url || "").trim() || "#";
+    card.target = "_blank";
+    card.rel = "noopener noreferrer nofollow sponsored";
+    card.setAttribute("aria-label", `Open sponsored link: ${item.name}`);
+    card.innerHTML = `<img src="${item.image}" alt="${item.alt || item.name}"/><div class="preset-item-copy"><strong>${item.name}</strong><span>Sponsored link</span></div>`;
+    presetList.appendChild(card);
   });
 }
 
 function renderAffiliateTrack(trackEl, items) {
   if (!trackEl) return;
   if (!items.length) {
-    trackEl.innerHTML = '<span class="affiliate-tag">No affiliate links</span>';
+    trackEl.innerHTML = '<span class="affiliate-tag">Add affiliate links in js/script.js</span>';
     return;
   }
 
   const chipMarkup = items
     .map(
-      (item) => `<a class="affiliate-chip" href="${item.url}" target="_blank" rel="noopener noreferrer nofollow sponsored" aria-label="Sponsored link: ${item.name}">${item.name}</a>`
+      (item) => `<a class="affiliate-chip" href="${item.url}" target="_blank" rel="noopener noreferrer nofollow sponsored" aria-label="Sponsored link: ${item.name}"><img src="${item.image}" alt="${item.alt || item.name}" loading="lazy"/><span>${item.name}</span></a>`
     )
     .join("");
 
@@ -218,9 +238,14 @@ function renderAffiliateTrack(trackEl, items) {
 }
 
 function renderAffiliateStrips() {
-  const items = binPresets
-    .filter((preset) => (preset.affiliateUrl || "").trim())
-    .map((preset) => ({ name: preset.name, url: preset.affiliateUrl }));
+  const items = affiliateProducts
+    .filter((item) => (item.url || "").trim())
+    .map((item) => ({
+      name: item.name,
+      url: item.url,
+      image: item.image,
+      alt: item.alt,
+    }));
 
   renderAffiliateTrack(affiliateTrackTop, items);
   renderAffiliateTrack(affiliateTrackBottom, items);
@@ -302,8 +327,8 @@ function formatInput() {
   form["thickness"].value = formatted[3];
 }
 
-function handleInput() {
-  formatInput();
+function handleInput(normalize = false) {
+  if (normalize) formatInput();
   let length = parseFloat(form["length"].value);
   let breadth = parseFloat(form["breadth"].value);
   let depth = parseFloat(form["depth"].value);
@@ -343,7 +368,7 @@ function handleInput() {
 }
 
 function downloadSvg() {
-  if (!handleInput()) return;
+  if (!handleInput(true)) return;
   let dl = document.createElement("a");
   document.body.appendChild(dl); // This line makes it work in Firefox.
   dl.style.display = "none";
@@ -380,17 +405,12 @@ typeCheckbox.addEventListener("change", () => {
     );
   });
   currentUnit = nextUnit;
-  renderPresetList();
-  if (selectedPresetId) {
-    const preset = binPresets.find((p) => p.id === selectedPresetId);
-    if (preset) updatePresetPreview(preset);
-  }
   handleInput();
 });
 
 inputFields.forEach((inputField) => {
-  inputField.addEventListener("input", handleInput);
-  inputField.addEventListener("change", handleInput);
+  inputField.addEventListener("input", () => handleInput(false));
+  inputField.addEventListener("change", () => handleInput(true));
 });
 form.addEventListener("submit", (e) => {
   e.preventDefault();
@@ -405,11 +425,10 @@ document.querySelectorAll(".part-btn").forEach((btn) => {
   btn.addEventListener("click", () => showPart(btn.dataset.part));
 });
 
-if (binPresets.length) {
-  selectedPresetId = binPresets[0].id;
-  updatePresetPreview(binPresets[0]);
+if (affiliateProducts.length) {
+  updatePresetPreview(affiliateProducts[0]);
 }
 renderPresetList();
 renderAffiliateStrips();
 setCanvasTab("preview");
-handleInput();
+handleInput(true);
