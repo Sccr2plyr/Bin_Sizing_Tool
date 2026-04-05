@@ -398,6 +398,8 @@ function getSharePayload({ silent = false } = {}) {
   if (!shareOrigin) return null;
 
   const url = new URL(window.location.pathname, shareOrigin);
+  const pageDirectoryUrl = new URL("./", url);
+  const previewImageUrl = new URL("preview.png", pageDirectoryUrl).toString();
   url.searchParams.set("l", form["length"].value);
   url.searchParams.set("b", form["breadth"].value);
   url.searchParams.set("d", form["depth"].value);
@@ -410,7 +412,7 @@ function getSharePayload({ silent = false } = {}) {
     title: "Bin Sizing Tool",
     text: "Check out this bin sizing setup:",
     url: url.toString(),
-    pinterestMedia: new URL("/preview.png", shareOrigin).toString(),
+    pinterestMedia: previewImageUrl,
     instagramText: `${INSTAGRAM_COPY_MESSAGE}\n${url.toString()}`,
   };
 }
