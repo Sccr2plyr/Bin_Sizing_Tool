@@ -32,7 +32,8 @@ let currentUnit = "in";
 let activeAffiliateId = null;
 let sharePanelOpen = true;
 
-const SHARE_PREVIEW_VERSION = "v4";
+const SHARE_PREVIEW_VERSION = "v5";
+const SHARE_IMAGE_VERSION = "2";
 const INSTAGRAM_COPY_MESSAGE = "Instagram doesn't support direct web sharing from the browser yet. Copy this link and add it to your story or bio:";
 
 const canvas = document.querySelector("canvas");
@@ -399,7 +400,9 @@ function getSharePayload({ silent = false } = {}) {
 
   const url = new URL(window.location.pathname, shareOrigin);
   const pageDirectoryUrl = new URL("./", url);
-  const previewImageUrl = new URL("preview.png", pageDirectoryUrl).toString();
+  const previewImageUrlObject = new URL("preview.png", pageDirectoryUrl);
+  previewImageUrlObject.searchParams.set("v", SHARE_IMAGE_VERSION);
+  const previewImageUrl = previewImageUrlObject.toString();
   url.searchParams.set("l", form["length"].value);
   url.searchParams.set("b", form["breadth"].value);
   url.searchParams.set("d", form["depth"].value);
