@@ -90,6 +90,46 @@ body {
   font-size: 2rem;
 }
 
+.share-section {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  flex-wrap: wrap;
+}
+
+.share-button {
+  border: 1px solid #0a8dd6;
+  background: #e7f5ff;
+  color: #075b88;
+  border-radius: 999px;
+  font-size: 0.8rem;
+  font-weight: bold;
+  padding: 0.38rem 0.8rem;
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s, color 0.15s;
+}
+
+.share-button:hover {
+  background: #d8efff;
+  border-color: #007dc2;
+  color: #014e78;
+}
+
+.share-status {
+  font-size: 0.72rem;
+  color: #4a4a4a;
+  min-height: 1em;
+}
+
+.share-status.success {
+  color: #0c7c39;
+}
+
+.share-status.error {
+  color: #b3321f;
+}
+
 .part-caption {
   font-size: 0.8rem;
   color: #666;
@@ -558,6 +598,9 @@ body {
   .form-container {
     padding: 2rem 1rem;
     gap: 2rem;
+  }
+  .share-section {
+    padding: 0 1rem;
   }
   .form {
     padding: 0 1rem;

@@ -19,8 +19,11 @@ const canvasTabs = Array.from(document.querySelectorAll(".canvas-tab"));
 const previewPanel = document.getElementById("panel-preview");
 const chatPanel = document.getElementById("panel-chat");
 const giscusHost = document.getElementById("giscus-thread");
+const shareButton = document.getElementById("share-config");
+const shareStatus = document.getElementById("share-status");
 let giscusLoaded = false;
 let currentUnit = "in";
+let activeAffiliateId = null;
 
 const canvas = document.querySelector("canvas");
 const canvasContainer = document.querySelector(".canvas-container");
@@ -195,6 +198,8 @@ function updateVisibleParts() {
 }
 
 function updatePresetPreview(item) {
+  if (!item || !previewLink || !previewImg || !previewName || !previewMeta) return;
+
   const hasLink = Boolean((item.url || "").trim());
   previewLink.href = hasLink ? item.url : "#";
   previewLink.classList.toggle("disabled", !hasLink);
@@ -203,6 +208,15 @@ function updatePresetPreview(item) {
   previewMeta.textContent = hasLink
     ? "Sponsored affiliate product"
     : "Sponsored affiliate product · Link pending";
+}
+
+function setActiveAffiliateCard(id) {
+  activeAffiliateId = id;
+  document.querySelectorAll(".preset-item").forEach((card) => {
+    const isActive = card.dataset.id === id;
+    card.classList.toggle("active", isActive);
+    card.setAttribute("aria-current", isActive ? "true" : "false");
+  });
 }
 
 function renderPresetList() {
@@ -215,9 +229,25 @@ function renderPresetList() {
     card.target = "_blank";
     card.rel = "noopener noreferrer nofollow sponsored";
     card.setAttribute("aria-label", `Open sponsored link: ${item.name}`);
+    card.dataset.id = item.id;
     card.innerHTML = `<img src="${item.image}" alt="${item.alt || item.name}"/><div class="preset-item-copy"><strong>${item.name}</strong><span>Sponsored link</span></div>`;
+
+    const handleSelect = () => {
+      updatePresetPreview(item);
+      setActiveAffiliateCard(item.id);
+    };
+    card.addEventListener("mouseenter", handleSelect);
+    card.addEventListener("focus", handleSelect);
+    card.addEventListener("click", handleSelect);
+
     presetList.appendChild(card);
   });
+
+  const firstItem = affiliateProducts[0];
+  if (firstItem) {
+    updatePresetPreview(firstItem);
+    setActiveAffiliateCard(firstItem.id);
+  }
 }
 
 function renderAffiliateTrack(trackEl, items) {
@@ -298,6 +328,66 @@ function setCanvasTab(tabName) {
   chatPanel?.setAttribute("aria-hidden", String(!isChat));
 
   if (isChat) loadGiscusIfNeeded();
+}
+
+function setShareStatus(message, type = "") {
+  if (!shareStatus) return;
+  shareStatus.textContent = message;
+  shareStatus.classList.remove("success", "error");
+  if (type) shareStatus.classList.add(type);
+}
+
+function buildShareUrl() {
+  const url = new URL(window.location.href);
+  url.searchParams.set("l", form["length"].value);
+  url.searchParams.set("b", form["breadth"].value);
+  url.searchParams.set("d", form["depth"].value);
+  url.searchParams.set("t", form["thickness"].value);
+  url.searchParams.set("u", typeCheckbox.checked ? "mm" : "in");
+  url.searchParams.set("parts", Array.from(selectedParts).join(","));
+  return url.toString();
+}
+
+async function copyToClipboard(text) {
+  if (navigator.clipboard && window.isSecureContext) {
+    await navigator.clipboard.writeText(text);
+    return;
+  }
+
+  const helper = document.createElement("textarea");
+  helper.value = text;
+  helper.style.position = "fixed";
+  helper.style.opacity = "0";
+  helper.style.pointerEvents = "none";
+  document.body.appendChild(helper);
+  helper.focus();
+  helper.select();
+  document.execCommand("copy");
+  document.body.removeChild(helper);
+}
+
+async function shareConfiguration() {
+  if (!handleInput(true)) {
+    setShareStatus("Fix measurements before sharing.", "error");
+    return;
+  }
+
+  const shareUrl = buildShareUrl();
+  const shareTitle = "Bin Sizing Configuration";
+  const shareText = "Open this bin sizing setup:";
+
+  try {
+    if (navigator.share) {
+      await navigator.share({ title: shareTitle, text: shareText, url: shareUrl });
+      setShareStatus("Configuration shared.", "success");
+      return;
+    }
+
+    await copyToClipboard(shareUrl);
+    setShareStatus("Share link copied to clipboard.", "success");
+  } catch (err) {
+    setShareStatus("Unable to share right now.", "error");
+  }
 }
 
 function render() {
@@ -425,9 +515,8 @@ document.querySelectorAll(".part-btn").forEach((btn) => {
   btn.addEventListener("click", () => showPart(btn.dataset.part));
 });
 
-if (affiliateProducts.length) {
-  updatePresetPreview(affiliateProducts[0]);
-}
+shareButton?.addEventListener("click", shareConfiguration);
+
 renderPresetList();
 renderAffiliateStrips();
 setCanvasTab("preview");
