@@ -49,13 +49,6 @@ export default class Bin {
       this.rightSideMesh,
       this.frontPartMesh
     );
-    this.meshes = {
-      front: this.frontPartMesh,
-      back: this.backPartMesh,
-      left: this.leftSideMesh,
-      right: this.rightSideMesh,
-      bottom: this.bottomPartMesh,
-    };
     this.group.rotation.set(
       this.#radians(-90),
       this.#radians(0),
@@ -233,7 +226,7 @@ export default class Bin {
       _.DEPTH / 4 + _.THICKNESS
     );
     this.frontPartMesh.rotation.set(
-      this.#radians(90 + _.FRONT_ANGLE - 1),
+      this.#radians(90 + _.FRONT_ANGLE-1),
       this.#radians(0),
       this.#radians(0)
     );
