@@ -2,9 +2,6 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-<!-- This site is hosted on Netlify. Anyone can build and deploy a site
-     like this one for free: https://netlify.new/?utm_campaign=loops&utm_source=ai-legible&utm_medium=owned&utm_content=comment&utm_id=f7581e9c-dda8-4650-931a-826c91018033
-     Netlify hosting facts for this site: static/SSR served via Netlify Edge. -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
     <!-- ===== SEO basics ===== -->
@@ -13,7 +10,7 @@
       name="description"
       content="Free online parts bin generator for laser cutters and CNC. Enter length, width, height and material thickness, preview the bin in 3D, and download a ready-to-cut SVG file in inches or mm."
     />
-    <link rel="canonical" href="https://laser-bin-generator.netlify.app/" />
+    <link rel="canonical" href="https://bin-sizing-tool.pages.dev/" />
     <meta name="robots" content="index, follow, max-image-preview:large" />
     <meta name="theme-color" content="#00a2ff" />
     <meta name="google-site-verification" content="bHwNNOIN9YBKF51g1H71tuniOHmLc3S4oCEis_eJQTk" />
@@ -31,8 +28,8 @@
       property="og:description"
       content="Design a custom parts bin, preview it in 3D, and download a ready-to-cut SVG for your laser cutter or CNC."
     />
-    <meta property="og:url" content="https://laser-bin-generator.netlify.app/" />
-    <meta property="og:image" content="https://laser-bin-generator.netlify.app/og-image.png" />
+    <meta property="og:url" content="https://bin-sizing-tool.pages.dev/" />
+    <meta property="og:image" content="https://bin-sizing-tool.pages.dev/og-image.png" />
     <meta property="og:image:width" content="1200" />
     <meta property="og:image:height" content="630" />
     <meta property="og:image:alt" content="3D preview of a custom laser cut storage bin" />
@@ -63,13 +60,13 @@
         "@context": "https://schema.org",
         "@type": "WebApplication",
         "name": "Bin Parts – Laser Cut Storage Bin Generator",
-        "url": "https://laser-bin-generator.netlify.app/",
+        "url": "https://bin-sizing-tool.pages.dev/",
         "description": "Free online generator that creates laser-cut and CNC-ready SVG plans for custom storage and parts bins from your length, width, height and material thickness.",
         "applicationCategory": "DesignApplication",
         "operatingSystem": "Any (runs in the browser)",
         "browserRequirements": "Requires a browser with WebGL",
         "isAccessibleForFree": true,
-        "image": "https://laser-bin-generator.netlify.app/og-image.png",
+        "image": "https://bin-sizing-tool.pages.dev/og-image.png",
         "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
         "featureList": [
           "Custom length, width, height and material thickness",
@@ -126,6 +123,11 @@
     <script src="./js/canvas2svg.js"></script>
   </head>
   <body>
+    <nav id="tool-nav" aria-label="More free maker tools" style="display:flex;flex-wrap:wrap;gap:6px 18px;align-items:center;padding:8px 16px;background:#222;font:14px/1.4 Arial,Helvetica,sans-serif">
+      <a href="https://laser-cnc-tools.pages.dev/" style="color:#ddd;text-decoration:none">All free tools</a>
+      <span aria-current="page" style="color:#fff;font-weight:bold">Bin generator</span>
+      <a href="https://paint-holder-sizing-tool.pages.dev/" style="color:#ddd;text-decoration:none">Paint holder generator</a>
+    </nav>
     <main class="container">
       <div class="form-container flex-item">
         <header class="site-header">
@@ -277,31 +279,31 @@
         <p>What you need to cut and assemble your bins:</p>
         <ul class="products">
           <li>
-            <a class="aff" data-product="baltic_birch_plywood" href="https://www.amazon.com/s?k=baltic+birch+plywood+sheets+laser&amp;tag=threetoedbear-20" target="_blank" rel="sponsored noopener">Baltic birch plywood sheets</a>
+            <a class="aff" data-product="baltic_birch_plywood" href="https://www.amazon.com/s?k=baltic+birch+plywood+sheets+laser&amp;tag=threetoedbear-20" target="_blank" rel="sponsored nofollow noopener">Baltic birch plywood sheets</a>
             <span>Strong, flat and laser-friendly. The go-to for shop bins.</span>
           </li>
           <li>
-            <a class="aff" data-product="mdf_sheets" href="https://www.amazon.com/s?k=mdf+sheets+for+laser+cutting&amp;tag=threetoedbear-20" target="_blank" rel="sponsored noopener">MDF sheets</a>
+            <a class="aff" data-product="mdf_sheets" href="https://www.amazon.com/s?k=mdf+sheets+for+laser+cutting&amp;tag=threetoedbear-20" target="_blank" rel="sponsored nofollow noopener">MDF sheets</a>
             <span>Cheap, consistent thickness, great for prototypes.</span>
           </li>
           <li>
-            <a class="aff" data-product="acrylic_sheets" href="https://www.amazon.com/s?k=cast+acrylic+sheet+laser+cutting&amp;tag=threetoedbear-20" target="_blank" rel="sponsored noopener">Cast acrylic sheets</a>
+            <a class="aff" data-product="acrylic_sheets" href="https://www.amazon.com/s?k=cast+acrylic+sheet+laser+cutting&amp;tag=threetoedbear-20" target="_blank" rel="sponsored nofollow noopener">Cast acrylic sheets</a>
             <span>For clear or colored bins you can see into.</span>
           </li>
           <li>
-            <a class="aff" data-product="digital_calipers" href="https://www.amazon.com/s?k=digital+calipers&amp;tag=threetoedbear-20" target="_blank" rel="sponsored noopener">Digital calipers</a>
+            <a class="aff" data-product="digital_calipers" href="https://www.amazon.com/s?k=digital+calipers&amp;tag=threetoedbear-20" target="_blank" rel="sponsored nofollow noopener">Digital calipers</a>
             <span>Measure your real sheet thickness before you generate.</span>
           </li>
           <li>
-            <a class="aff" data-product="wood_glue" href="https://www.amazon.com/s?k=titebond+wood+glue&amp;tag=threetoedbear-20" target="_blank" rel="sponsored noopener">Wood glue</a>
+            <a class="aff" data-product="wood_glue" href="https://www.amazon.com/s?k=titebond+wood+glue&amp;tag=threetoedbear-20" target="_blank" rel="sponsored nofollow noopener">Wood glue</a>
             <span>A few drops in the slots makes the bin permanent.</span>
           </li>
           <li>
-            <a class="aff" data-product="masking_tape" href="https://www.amazon.com/s?k=laser+transfer+masking+tape&amp;tag=threetoedbear-20" target="_blank" rel="sponsored noopener">Laser masking tape</a>
+            <a class="aff" data-product="masking_tape" href="https://www.amazon.com/s?k=laser+transfer+masking+tape&amp;tag=threetoedbear-20" target="_blank" rel="sponsored nofollow noopener">Laser masking tape</a>
             <span>Prevents scorch marks on the faces of your parts.</span>
           </li>
           <li>
-            <a class="aff" data-product="honeycomb_bed" href="https://www.amazon.com/s?k=laser+honeycomb+bed&amp;tag=threetoedbear-20" target="_blank" rel="sponsored noopener">Honeycomb laser bed</a>
+            <a class="aff" data-product="honeycomb_bed" href="https://www.amazon.com/s?k=laser+honeycomb+bed&amp;tag=threetoedbear-20" target="_blank" rel="sponsored nofollow noopener">Honeycomb laser bed</a>
             <span>Cleaner cuts with less flashback on the back side.</span>
           </li>
         </ul>
@@ -315,9 +317,9 @@
         <h2>Share this tool</h2>
         <p>Know someone with a laser cutter or CNC? Send it their way, or post your build.</p>
         <div class="share-buttons">
-          <a class="share-btn pinterest" data-network="pinterest" target="_blank" rel="noopener" href="https://www.pinterest.com/pin/create/button/?url=https%3A%2F%2Flaser-bin-generator.netlify.app%2F&amp;media=https%3A%2F%2Flaser-bin-generator.netlify.app%2Fog-image.png&amp;description=Free%20laser%20cut%20storage%20bin%20generator%20%E2%80%93%20enter%20your%20sizes%2C%20preview%20in%203D%2C%20download%20a%20cut-ready%20SVG">Pinterest</a>
-          <a class="share-btn reddit" data-network="reddit" target="_blank" rel="noopener" href="https://www.reddit.com/submit?url=https%3A%2F%2Flaser-bin-generator.netlify.app%2F&amp;title=Free%20laser%20cut%20storage%20bin%20generator%20(custom%20sizes%2C%20SVG%20download)">Reddit</a>
-          <a class="share-btn facebook" data-network="facebook" target="_blank" rel="noopener" href="https://www.facebook.com/sharer/sharer.php?u=https%3A%2F%2Flaser-bin-generator.netlify.app%2F">Facebook</a>
+          <a class="share-btn pinterest" data-network="pinterest" target="_blank" rel="noopener" href="https://www.pinterest.com/pin/create/button/?url=https%3A%2F%2Fbin-sizing-tool.pages.dev%2F&amp;media=https%3A%2F%2Fbin-sizing-tool.pages.dev%2Fog-image.png&amp;description=Free%20laser%20cut%20storage%20bin%20generator%20%E2%80%93%20enter%20your%20sizes%2C%20preview%20in%203D%2C%20download%20a%20cut-ready%20SVG">Pinterest</a>
+          <a class="share-btn reddit" data-network="reddit" target="_blank" rel="noopener" href="https://www.reddit.com/submit?url=https%3A%2F%2Fbin-sizing-tool.pages.dev%2F&amp;title=Free%20laser%20cut%20storage%20bin%20generator%20(custom%20sizes%2C%20SVG%20download)">Reddit</a>
+          <a class="share-btn facebook" data-network="facebook" target="_blank" rel="noopener" href="https://www.facebook.com/sharer/sharer.php?u=https%3A%2F%2Fbin-sizing-tool.pages.dev%2F">Facebook</a>
           <button type="button" class="share-btn copy" data-network="copy_link">Copy link</button>
         </div>
       </section>
@@ -372,7 +374,7 @@
         b.addEventListener("click", function () {
           track("share", { method: b.dataset.network });
           if (b.dataset.network === "copy_link") {
-            var url = "https://laser-bin-generator.netlify.app/";
+            var url = "https://bin-sizing-tool.pages.dev/";
             var done = function () {
               b.textContent = "Link copied!";
               setTimeout(function () { b.textContent = "Copy link"; }, 2000);
